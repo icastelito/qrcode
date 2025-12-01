@@ -3,6 +3,9 @@ import { prisma } from "@/lib/prisma";
 import { IoArrowForward, IoAdd } from "react-icons/io5";
 import QRCodeListActions from "@/components/QRCodeListActions";
 
+// Força renderização dinâmica (não faz prerender no build)
+export const dynamic = "force-dynamic";
+
 type QRCodeWithCount = {
 	id: string;
 	name: string;

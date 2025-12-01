@@ -30,6 +30,8 @@ RUN npx prisma generate
 # Define variáveis de ambiente para build
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
+# DATABASE_URL dummy para build (páginas dinâmicas não precisam de conexão real)
+ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
 
 # Build da aplicação
 RUN npm run build
