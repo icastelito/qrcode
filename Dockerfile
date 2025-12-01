@@ -73,5 +73,5 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Inicialização: executa migrations usando o binário local do Prisma
-CMD ["sh", "-c", "node node_modules/prisma/build/index.js migrate deploy && node server.js"]
+# Inicialização: apenas inicia o servidor (migrations devem ser executadas manualmente)
+CMD ["node", "server.js"]
