@@ -1,0 +1,94 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ================================
+// Tabela de QR Codes
+// ================================
+model QrCode {
+  id        String   @id @default(cuid())
+  name      String
+  targetUrl String   @map("target_url")
+  style     Json?    // Cores, tamanho, margem, logo, etc.
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  // Relacionamento com logs de acesso
+  accessLogs QrAccessLog[]
+
+  @@map("qr_code")
+}
+
+// ================================
+// Tabela de Logs de Acesso (Rastreamento)
+// ================================
+model QrAccessLog {
+  id        String   @id @default(cuid())
+  qrId      String   @map("qr_id")
+  timestamp DateTime @default(now())
+  
+  // Identificação (LGPD/GDPR compliant)
+  ipHash    String   @map("ip_hash") // IP anonimizado
+  sessionId String?  @map("session_id") // ID da sessão
+  isUniqueVisitor Boolean @default(false) @map("is_unique_visitor")
+  
+  // User Agent e Dispositivo
+  userAgent      String?  @map("user_agent")
+  device         String?  // mobile, desktop, tablet
+  isMobile       Boolean  @default(false) @map("is_mobile")
+  browser        String?  // Chrome, Safari, Firefox, etc.
+  browserVersion String?  @map("browser_version")
+  platform       String?  // Windows, iOS, Android, etc.
+  osVersion      String?  @map("os_version")
+  
+  // Tela
+  screenWidth  Int? @map("screen_width")
+  screenHeight Int? @map("screen_height")
+  
+  // Geolocalização
+  country   String?
+  region    String?  // Estado/Região
+  city      String?
+  timezone  String?  // America/Sao_Paulo
+  latitude  Float?
+  longitude Float?
+  
+  // Origem e Campanha (UTM)
+  referer     String?
+  utmSource   String? @map("utm_source")
+  utmMedium   String? @map("utm_medium")
+  utmCampaign String? @map("utm_campaign")
+  utmTerm     String? @map("utm_term")
+  utmContent  String? @map("utm_content")
+  
+  // Contexto
+  language   String?  // Idioma preferido (pt-BR, en-US)
+  scanMethod String?  @map("scan_method") // camera, nfc, link_direto
+  
+  // Performance e Segurança
+  responseTime Int?     @map("response_time") // ms
+  isBot        Boolean  @default(false) @map("is_bot")
+
+  // Relacionamento com QR Code
+  qrCode QrCode @relation(fields: [qrId], references: [id], onDelete: Cascade)
+
+  // Índices para consultas otimizadas
+  @@index([qrId])
+  @@index([timestamp])
+  @@index([qrId, timestamp])
+  @@index([ipHash])
+  @@index([country])
+  @@index([device])
+  @@index([browser])
+  @@index([utmSource])
+  @@index([utmCampaign])
+  @@map("qr_access_log")
+}

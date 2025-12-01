@@ -1,0 +1,61 @@
+services:
+    # ================================
+    # Banco de Dados PostgreSQL
+    # ================================
+    db:
+        image: postgres:16-alpine
+        container_name: qrcode-db
+        restart: unless-stopped
+        environment:
+            POSTGRES_USER: ${POSTGRES_USER:-qrcode_user}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-qrcode_secret_password}
+            POSTGRES_DB: ${POSTGRES_DB:-qrcode_db}
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        ports:
+            - "5432:5432"
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-qrcode_user} -d ${POSTGRES_DB:-qrcode_db}"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+            start_period: 10s
+        networks:
+            - qrcode-network
+
+    # ================================
+    # Aplicação Next.js
+    # ================================
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: qrcode-app
+        restart: unless-stopped
+        ports:
+            - "3000:3000"
+        environment:
+            - NODE_ENV=production
+            - DATABASE_URL=postgresql://${POSTGRES_USER:-qrcode_user}:${POSTGRES_PASSWORD:-qrcode_secret_password}@db:5432/${POSTGRES_DB:-qrcode_db}?schema=public
+            - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-sua-chave-secreta-aqui}
+            - IP_HASH_SALT=${IP_HASH_SALT:-salt-secreto-para-hash}
+            - NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL:-http://localhost:3000}
+        depends_on:
+            db:
+                condition: service_healthy
+        healthcheck:
+            test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/api/health"]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+            start_period: 40s
+        networks:
+            - qrcode-network
+
+volumes:
+    postgres_data:
+        driver: local
+
+networks:
+    qrcode-network:
+        driver: bridge
