@@ -4,7 +4,7 @@
 
 # Estágio 1: Dependências
 FROM node:20-alpine AS deps
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
 # Copia arquivos de dependências
@@ -17,6 +17,7 @@ RUN npm ci
 # ================================
 # Estágio 2: Build
 FROM node:20-alpine AS builder
+RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
 # Copia dependências do estágio anterior
@@ -36,6 +37,7 @@ RUN npm run build
 # ================================
 # Estágio 3: Runner (Produção)
 FROM node:20-alpine AS runner
+RUN apk add --no-cache openssl
 WORKDIR /app
 
 ENV NODE_ENV=production

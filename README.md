@@ -8,9 +8,9 @@ Este projeto está configurado para usar um container PostgreSQL existente (`con
 
 ### Pré-requisitos
 
-- Docker e Docker Compose instalados
-- Container PostgreSQL `contador-visitas-db` rodando
-- Acesso à rede Docker do container existente
+-   Docker e Docker Compose instalados
+-   Container PostgreSQL `contador-visitas-db` rodando
+-   Acesso à rede Docker do container existente
 
 ### Passo a Passo
 
@@ -45,6 +45,7 @@ nano .env
 ```
 
 **Exemplo de `.env`:**
+
 ```env
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=sua_senha_do_postgres
@@ -70,8 +71,8 @@ docker ps
 
 #### 5. Verificar a aplicação
 
-- Dashboard: `http://seu-servidor:3007/dashboard/qr`
-- Health Check: `http://seu-servidor:3007/api/health`
+-   Dashboard: `http://seu-servidor:3007/dashboard/qr`
+-   Health Check: `http://seu-servidor:3007/api/health`
 
 ### Comandos Úteis
 
@@ -98,11 +99,13 @@ docker exec -it contador-visitas-db psql -U postgres -d qrcode_tracker -c "\dt"
 ### Troubleshooting
 
 **Erro de conexão com o banco:**
+
 1. Verifique se o container `contador-visitas-db` está rodando
 2. Verifique se a rede Docker está correta no `.env`
 3. Confirme usuário e senha do PostgreSQL
 
 **Erro de rede não encontrada:**
+
 ```bash
 # Liste as redes disponíveis
 docker network ls
@@ -145,10 +148,9 @@ src/
 
 ## 🔗 Endpoints da API
 
-- `POST /api/qr/create` - Criar QR Code
-- `GET /api/qr/[id]` - Obter QR Code
-- `PUT /api/qr/[id]/style` - Atualizar estilo
-- `DELETE /api/qr/[id]/delete` - Deletar QR Code
-- `GET /api/qr/preview` - Preview de QR Code
-- `GET /r/[id]` - Redirecionamento com tracking
-
+-   `POST /api/qr/create` - Criar QR Code
+-   `GET /api/qr/[id]` - Obter QR Code
+-   `PUT /api/qr/[id]/style` - Atualizar estilo
+-   `DELETE /api/qr/[id]/delete` - Deletar QR Code
+-   `GET /api/qr/preview` - Preview de QR Code
+-   `GET /r/[id]` - Redirecionamento com tracking
