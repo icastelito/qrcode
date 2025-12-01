@@ -63,10 +63,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # Copia Prisma para migrations
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
 COPY --from=builder /app/prisma ./prisma
-
-# Instala apenas o CLI do Prisma para migrations
-RUN npm install -g prisma
 
 USER nextjs
 
@@ -75,5 +73,5 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Script de inicialização com migrations
-CMD ["sh", "-c", "prisma migrate deploy && node server.js"]
+# Inicialização: executa migrations com npx (usa a versão local) e depois inicia o servidor
+CMD ["sh", "-c", "npx prisma migrate deploy && node server.js"]
