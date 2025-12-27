@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { collectTrackingData } from "@/lib/tracking-utils";
+import { collectTrackingData, getClientIP } from "@/lib/tracking-utils";
 import { getGeoFromIPAsync } from "@/lib/geoip";
 
 interface RouteParams {
@@ -25,7 +25,12 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 		// 2. Coleta TODOS os dados de tracking
 		const trackingData = collectTrackingData(request);
 
-		// 3. Tenta resolver geolocalização via IP (fallback se Cloudflare não estiver disponível)
+		// 3. Obtém o IP real do cliente
+		const clientIP = getClientIP(request.headers);
+		console.log(`[Tracking] IP do cliente: ${clientIP}`);
+
+		// 4. Tenta resolver geolocalização
+		// Primeiro verifica se já tem dados do Cloudflare
 		let geoData = {
 			country: trackingData.country,
 			region: trackingData.region,
@@ -35,20 +40,19 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 			longitude: trackingData.longitude,
 		};
 
-		// Se não tiver dados do Cloudflare, tenta via serviço de GeoIP
-		if (!geoData.country) {
-			const headers = request.headers;
-			const forwarded = headers.get("x-forwarded-for");
-			const ip = forwarded ? forwarded.split(",")[0].trim() : headers.get("x-real-ip") || "0.0.0.0";
-			const geo = await getGeoFromIPAsync(ip);
+		// Se não tiver dados do Cloudflare, busca via API de GeoIP
+		if (!geoData.city || !geoData.country) {
+			console.log(`[Tracking] Buscando geolocalização para IP: ${clientIP}`);
+			const geo = await getGeoFromIPAsync(clientIP);
 			geoData = {
-				country: geo.country,
-				region: geo.region || null,
-				city: geo.city,
-				timezone: geo.timezone || null,
-				latitude: geo.latitude || null,
-				longitude: geo.longitude || null,
+				country: geo.country || geoData.country,
+				region: geo.region || geoData.region,
+				city: geo.city || geoData.city,
+				timezone: geo.timezone || geoData.timezone,
+				latitude: geo.latitude || geoData.latitude,
+				longitude: geo.longitude || geoData.longitude,
 			};
+			console.log(`[Tracking] Geolocalização: ${geoData.city}, ${geoData.region}, ${geoData.country}`);
 		}
 
 		// 4. Verifica se é visitante único (baseado no ipHash + qrId)

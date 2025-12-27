@@ -1,5 +1,5 @@
-// Dados GeoIP simplificados baseados em ranges conhecidos
-// Em produção, use uma lib como 'geoip-lite' ou serviço externo
+// Dados GeoIP com múltiplas APIs de fallback
+// Para melhor precisão em produção, considere MaxMind GeoIP2
 
 interface GeoData {
 	country: string | null;
@@ -61,33 +61,19 @@ export function getGeoFromIP(ip: string): GeoData {
 }
 
 /**
- * Versão assíncrona que pode chamar API externa
- * Exemplo com ip-api.com (gratuito para uso não-comercial)
+ * Tenta buscar geolocalização via ip-api.com
  */
-export async function getGeoFromIPAsync(ip: string): Promise<GeoData> {
-	if (isPrivateIP(ip)) {
-		return LOCAL_GEO;
-	}
-
+async function tryIpApi(ip: string): Promise<GeoData | null> {
 	try {
-		// API gratuita - em produção use MaxMind ou similar
-		// Campos: country, regionName, city, timezone, lat, lon
 		const response = await fetch(
 			`http://ip-api.com/json/${ip}?fields=status,country,regionName,city,timezone,lat,lon`,
-			{
-				signal: AbortSignal.timeout(2000), // Timeout de 2s
-			}
+			{ signal: AbortSignal.timeout(3000) }
 		);
 
-		if (!response.ok) {
-			return DEFAULT_GEO;
-		}
+		if (!response.ok) return null;
 
 		const data = await response.json();
-
-		if (data.status !== "success") {
-			return DEFAULT_GEO;
-		}
+		if (data.status !== "success") return null;
 
 		return {
 			country: data.country || null,
@@ -98,7 +84,82 @@ export async function getGeoFromIPAsync(ip: string): Promise<GeoData> {
 			longitude: data.lon || null,
 		};
 	} catch {
-		// Falha silenciosa - não bloqueia o redirect
-		return DEFAULT_GEO;
+		return null;
 	}
+}
+
+/**
+ * Tenta buscar geolocalização via ipwho.is (HTTPS, sem limite)
+ */
+async function tryIpWhois(ip: string): Promise<GeoData | null> {
+	try {
+		const response = await fetch(`https://ipwho.is/${ip}`, {
+			signal: AbortSignal.timeout(3000),
+		});
+
+		if (!response.ok) return null;
+
+		const data = await response.json();
+		if (!data.success) return null;
+
+		return {
+			country: data.country || null,
+			region: data.region || null,
+			city: data.city || null,
+			timezone: data.timezone?.id || null,
+			latitude: data.latitude || null,
+			longitude: data.longitude || null,
+		};
+	} catch {
+		return null;
+	}
+}
+
+/**
+ * Tenta buscar geolocalização via ipapi.co (HTTPS, 1000 req/dia grátis)
+ */
+async function tryIpapiCo(ip: string): Promise<GeoData | null> {
+	try {
+		const response = await fetch(`https://ipapi.co/${ip}/json/`, {
+			signal: AbortSignal.timeout(3000),
+		});
+
+		if (!response.ok) return null;
+
+		const data = await response.json();
+		if (data.error) return null;
+
+		return {
+			country: data.country_name || null,
+			region: data.region || null,
+			city: data.city || null,
+			timezone: data.timezone || null,
+			latitude: data.latitude || null,
+			longitude: data.longitude || null,
+		};
+	} catch {
+		return null;
+	}
+}
+
+/**
+ * Versão assíncrona que tenta múltiplas APIs em sequência
+ * Retorna assim que uma delas funcionar
+ */
+export async function getGeoFromIPAsync(ip: string): Promise<GeoData> {
+	if (isPrivateIP(ip)) {
+		return LOCAL_GEO;
+	}
+
+	// Tenta as APIs em ordem de preferência
+	// ipwho.is é HTTPS e sem limite rígido
+	const result = (await tryIpWhois(ip)) || (await tryIpapiCo(ip)) || (await tryIpApi(ip));
+
+	if (result) {
+		console.log(`[GeoIP] Resolvido IP ${ip.substring(0, 8)}... -> ${result.city}, ${result.country}`);
+		return result;
+	}
+
+	console.warn(`[GeoIP] Não foi possível resolver IP ${ip.substring(0, 8)}...`);
+	return DEFAULT_GEO;
 }
