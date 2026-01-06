@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { formatDateTimeBR, formatDateBR, toISODateBR, getDaysAgoBR, getTodayStartBR } from "@/lib/date-utils";
 import {
 	IoArrowBack,
 	IoDownload,
@@ -64,15 +65,10 @@ async function getAccessStats(qrId: string): Promise<{
 	totalToday: number;
 	totalThisWeek: number;
 }> {
-	// Acessos por dia (últimos 30 dias)
-	const thirtyDaysAgo = new Date();
-	thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-	const today = new Date();
-	today.setHours(0, 0, 0, 0);
-
-	const weekAgo = new Date();
-	weekAgo.setDate(weekAgo.getDate() - 7);
+	// Acessos por dia (últimos 30 dias) - usando timezone do Brasil
+	const thirtyDaysAgo = getDaysAgoBR(30);
+	const today = getTodayStartBR();
+	const weekAgo = getDaysAgoBR(7);
 
 	const accessesByDay = await prisma.qrAccessLog.groupBy({
 		by: ["timestamp"],
@@ -83,10 +79,10 @@ async function getAccessStats(qrId: string): Promise<{
 		_count: true,
 	});
 
-	// Agrupa por dia
+	// Agrupa por dia (usando timezone do Brasil)
 	const dailyStats: Record<string, number> = {};
 	for (const access of accessesByDay) {
-		const day = new Date(access.timestamp).toISOString().split("T")[0];
+		const day = toISODateBR(access.timestamp);
 		dailyStats[day] = (dailyStats[day] || 0) + access._count;
 	}
 
@@ -193,12 +189,12 @@ export default async function QRCodeDetailPage({ params }: PageProps) {
 	// Cache buster baseado no updatedAt para forçar reload da imagem após edição
 	const cacheBuster = qrCode.updatedAt ? new Date(qrCode.updatedAt).getTime() : Date.now();
 
-	// Prepara dados do gráfico (últimos 14 dias)
+	// Prepara dados do gráfico (últimos 14 dias) - usando timezone do Brasil
 	const chartData: { date: string; count: number }[] = [];
 	for (let i = 13; i >= 0; i--) {
 		const date = new Date();
 		date.setDate(date.getDate() - i);
-		const dateStr = date.toISOString().split("T")[0];
+		const dateStr = toISODateBR(date);
 		chartData.push({
 			date: dateStr,
 			count: stats.dailyStats[dateStr] || 0,
@@ -278,8 +274,7 @@ export default async function QRCodeDetailPage({ params }: PageProps) {
 								</code>
 							</p>
 							<p>
-								<span className="font-medium">Criado em:</span>{" "}
-								{new Date(qrCode.createdAt).toLocaleString("pt-BR")}
+								<span className="font-medium">Criado em:</span> {formatDateTimeBR(qrCode.createdAt)}
 							</p>
 						</div>
 
@@ -363,6 +358,7 @@ export default async function QRCodeDetailPage({ params }: PageProps) {
 												<div className="font-medium">{day.count} acessos</div>
 												<div className="text-xs text-gray-300">
 													{new Date(day.date + "T12:00:00").toLocaleDateString("pt-BR", {
+														timeZone: "America/Sao_Paulo",
 														weekday: "short",
 														day: "2-digit",
 														month: "short",
@@ -653,7 +649,7 @@ export default async function QRCodeDetailPage({ params }: PageProps) {
 											className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
 										>
 											<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-												{new Date(log.timestamp).toLocaleString("pt-BR")}
+												{formatDateTimeBR(log.timestamp)}
 											</td>
 											<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
 												<span className="flex items-center gap-2 capitalize">

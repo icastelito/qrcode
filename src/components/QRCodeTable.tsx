@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { IoArrowForward, IoChevronUp, IoChevronDown } from "react-icons/io5";
 import QRCodeListActions from "@/components/QRCodeListActions";
+import { formatDateBR } from "@/lib/date-utils";
 
 type QRCodeWithCount = {
 	id: string;
@@ -180,7 +181,7 @@ export default function QRCodeTable({ qrCodes }: QRCodeTableProps) {
 								</a>
 							</td>
 							<td className="px-6 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-								{new Date(qr.createdAt).toLocaleDateString("pt-BR")}
+								{formatDateBR(qr.createdAt)}
 							</td>
 							<td className="px-6 py-4 whitespace-nowrap">
 								<span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
