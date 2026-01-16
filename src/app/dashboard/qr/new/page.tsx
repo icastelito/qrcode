@@ -199,25 +199,31 @@ export default function NewQRCodePage() {
 
 	return (
 		<div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-			<div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+			<div className="max-w-4xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
 				{/* Breadcrumb */}
-				<nav className="mb-4">
-					<Link href="/dashboard/qr" className="text-blue-600 hover:text-blue-700 flex items-center gap-1">
-						<IoArrowBack className="w-4 h-4" /> Voltar para lista
+				<nav className="mb-3 sm:mb-4">
+					<Link
+						href="/dashboard/qr"
+						className="text-blue-600 hover:text-blue-700 flex items-center gap-1 text-sm sm:text-base"
+					>
+						<IoArrowBack className="w-4 h-4" /> <span className="hidden xs:inline">Voltar para lista</span>
+						<span className="xs:hidden">Voltar</span>
 					</Link>
 				</nav>
 
-				<h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Criar Novo QR Code</h1>
+				<h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6 lg:mb-8">
+					Criar Novo QR Code
+				</h1>
 
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+				<div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
 					{/* Formulário */}
-					<div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-						<form onSubmit={handleSubmit} className="space-y-6">
+					<div className="bg-white dark:bg-gray-800 rounded-xl shadow p-4 sm:p-6">
+						<form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
 							{/* Nome */}
 							<div>
 								<label
 									htmlFor="name"
-									className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+									className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
 								>
 									Nome do QR Code *
 								</label>
@@ -227,7 +233,7 @@ export default function NewQRCodePage() {
 									required
 									value={formData.name}
 									onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-									className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+									className="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
 									placeholder="Ex: Campanha Black Friday"
 								/>
 							</div>
@@ -236,7 +242,7 @@ export default function NewQRCodePage() {
 							<div>
 								<label
 									htmlFor="targetUrl"
-									className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+									className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
 								>
 									URL de Destino *
 								</label>
@@ -246,7 +252,7 @@ export default function NewQRCodePage() {
 									required
 									value={formData.targetUrl}
 									onChange={(e) => setFormData({ ...formData, targetUrl: e.target.value })}
-									className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+									className="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
 									placeholder="https://exemplo.com/pagina"
 								/>
 							</div>
@@ -255,7 +261,7 @@ export default function NewQRCodePage() {
 							<div>
 								<label
 									htmlFor="size"
-									className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+									className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
 								>
 									Tamanho: {formData.size}px
 								</label>
@@ -272,11 +278,11 @@ export default function NewQRCodePage() {
 							</div>
 
 							{/* Cores */}
-							<div className="grid grid-cols-2 gap-4">
+							<div className="grid grid-cols-2 gap-3 sm:gap-4">
 								<div>
 									<label
 										htmlFor="darkColor"
-										className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+										className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
 									>
 										Cor Principal
 									</label>
@@ -285,13 +291,13 @@ export default function NewQRCodePage() {
 										id="darkColor"
 										value={formData.darkColor}
 										onChange={(e) => setFormData({ ...formData, darkColor: e.target.value })}
-										className="w-full h-10 rounded cursor-pointer"
+										className="w-full h-8 sm:h-10 rounded cursor-pointer"
 									/>
 								</div>
 								<div>
 									<label
 										htmlFor="lightColor"
-										className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+										className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
 									>
 										Cor de Fundo
 									</label>
@@ -300,26 +306,38 @@ export default function NewQRCodePage() {
 										id="lightColor"
 										value={formData.lightColor}
 										onChange={(e) => setFormData({ ...formData, lightColor: e.target.value })}
-										className="w-full h-10 rounded cursor-pointer"
+										className="w-full h-8 sm:h-10 rounded cursor-pointer"
 									/>
 								</div>
 							</div>
 
 							{/* Estilo do Módulo (Padrão) */}
 							<div>
-								<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+								<label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
 									Estilo do Padrão
 								</label>
-								<div className="grid grid-cols-4 gap-2">
+								<div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
 									{[
-										{ value: "square", label: "Quadrado", icon: <IoSquare className="w-6 h-6" /> },
+										{
+											value: "square",
+											label: "Quadrado",
+											icon: <IoSquare className="w-5 h-5 sm:w-6 sm:h-6" />,
+										},
 										{
 											value: "rounded",
 											label: "Arredondado",
-											icon: <IoApps className="w-6 h-6" />,
+											icon: <IoApps className="w-5 h-5 sm:w-6 sm:h-6" />,
 										},
-										{ value: "circle", label: "Círculo", icon: <IoEllipse className="w-6 h-6" /> },
-										{ value: "diamond", label: "Losango", icon: <IoDiamond className="w-6 h-6" /> },
+										{
+											value: "circle",
+											label: "Círculo",
+											icon: <IoEllipse className="w-5 h-5 sm:w-6 sm:h-6" />,
+										},
+										{
+											value: "diamond",
+											label: "Losango",
+											icon: <IoDiamond className="w-5 h-5 sm:w-6 sm:h-6" />,
+										},
 									].map((style) => (
 										<button
 											key={style.value}
@@ -334,14 +352,14 @@ export default function NewQRCodePage() {
 														| "diamond",
 												})
 											}
-											className={`p-3 rounded-lg border-2 transition-all flex flex-col items-center justify-center gap-1 ${
+											className={`p-2 sm:p-3 rounded-lg border-2 transition-all flex flex-col items-center justify-center gap-1 ${
 												formData.moduleStyle === style.value
 													? "border-blue-500 bg-blue-50 dark:bg-blue-900/30"
 													: "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
 											}`}
 										>
 											{style.icon}
-											<span className="text-xs text-gray-600 dark:text-gray-400">
+											<span className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">
 												{style.label}
 											</span>
 										</button>
@@ -351,13 +369,13 @@ export default function NewQRCodePage() {
 
 							{/* Logo Upload */}
 							<div>
-								<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+								<label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
 									Logo (opcional)
 								</label>
-								<div className="space-y-3">
+								<div className="space-y-2 sm:space-y-3">
 									{logoPreview ? (
-										<div className="flex items-center gap-4">
-											<div className="relative w-16 h-16 rounded-lg overflow-hidden border border-gray-300 dark:border-gray-600">
+										<div className="flex items-center gap-3 sm:gap-4">
+											<div className="relative w-12 h-12 sm:w-16 sm:h-16 rounded-lg overflow-hidden border border-gray-300 dark:border-gray-600 flex-shrink-0">
 												<Image
 													src={logoPreview}
 													alt="Logo preview"
@@ -368,21 +386,24 @@ export default function NewQRCodePage() {
 											<button
 												type="button"
 												onClick={removeLogo}
-												className="text-red-600 hover:text-red-700 text-sm font-medium flex items-center gap-1"
+												className="text-red-600 hover:text-red-700 text-xs sm:text-sm font-medium flex items-center gap-1"
 											>
-												<IoClose className="w-4 h-4" /> Remover logo
+												<IoClose className="w-4 h-4" />{" "}
+												<span className="hidden xs:inline">Remover</span> logo
 											</button>
 										</div>
 									) : (
 										<div
 											onClick={() => fileInputRef.current?.click()}
-											className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition-colors"
+											className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-3 sm:p-4 text-center cursor-pointer hover:border-blue-500 transition-colors"
 										>
-											<IoImage className="w-8 h-8 mx-auto text-gray-400" />
-											<p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+											<IoImage className="w-6 h-6 sm:w-8 sm:h-8 mx-auto text-gray-400" />
+											<p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
 												Clique para adicionar uma logo
 											</p>
-											<p className="text-xs text-gray-400 dark:text-gray-500">PNG, JPG até 6MB</p>
+											<p className="text-[10px] sm:text-xs text-gray-400 dark:text-gray-500">
+												PNG, JPG até 6MB
+											</p>
 										</div>
 									)}
 									<input
@@ -400,7 +421,7 @@ export default function NewQRCodePage() {
 								<div>
 									<label
 										htmlFor="logoSize"
-										className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+										className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
 									>
 										Tamanho da Logo: {formData.logoSize}%
 									</label>
@@ -416,7 +437,7 @@ export default function NewQRCodePage() {
 										}
 										className="w-full"
 									/>
-									<p className="text-xs text-gray-400 mt-1">
+									<p className="text-[10px] sm:text-xs text-gray-400 mt-1">
 										Máximo de 25% para garantir leitura do QR
 									</p>
 								</div>
@@ -424,7 +445,7 @@ export default function NewQRCodePage() {
 
 							{/* Erro */}
 							{error && (
-								<div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm">
+								<div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-2 sm:p-3 rounded-lg text-xs sm:text-sm">
 									{error}
 								</div>
 							)}
@@ -433,7 +454,7 @@ export default function NewQRCodePage() {
 							<button
 								type="submit"
 								disabled={isLoading || !formData.name || !formData.targetUrl}
-								className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-3 px-4 rounded-lg transition-colors"
+								className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2 sm:py-3 px-3 sm:px-4 rounded-lg transition-colors text-sm sm:text-base"
 							>
 								{isLoading ? "Salvando..." : "Salvar QR Code"}
 							</button>
@@ -441,13 +462,15 @@ export default function NewQRCodePage() {
 					</div>
 
 					{/* Preview */}
-					<div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 flex flex-col items-center justify-center">
-						<h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Prévia em Tempo Real</h3>
+					<div className="bg-white dark:bg-gray-800 rounded-xl shadow p-4 sm:p-6 flex flex-col items-center justify-center order-first lg:order-last">
+						<h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white mb-3 sm:mb-4">
+							Prévia em Tempo Real
+						</h3>
 
 						<div className="relative">
 							{isLoadingPreview && (
 								<div className="absolute inset-0 bg-white/50 dark:bg-gray-800/50 flex items-center justify-center rounded-lg z-10">
-									<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+									<div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-blue-600"></div>
 								</div>
 							)}
 							{previewUrl ? (
@@ -456,33 +479,36 @@ export default function NewQRCodePage() {
 									alt="QR Code Preview"
 									width={280}
 									height={280}
-									className="rounded-lg"
+									className="rounded-lg w-[200px] h-[200px] sm:w-[240px] sm:h-[240px] lg:w-[280px] lg:h-[280px]"
 								/>
 							) : (
-								<div className="w-[280px] h-[280px] border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center">
-									<IoPhonePortrait className="w-12 h-12 text-gray-400" />
+								<div className="w-[200px] h-[200px] sm:w-[240px] sm:h-[240px] lg:w-[280px] lg:h-[280px] border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center">
+									<IoPhonePortrait className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400" />
 								</div>
 							)}
 						</div>
 
-						<p className="text-xs text-gray-400 mt-3 text-center">A prévia atualiza automaticamente</p>
+						<p className="text-[10px] sm:text-xs text-gray-400 mt-2 sm:mt-3 text-center">
+							A prévia atualiza automaticamente
+						</p>
 
 						{/* Ações após salvar */}
 						{savedQrUrl && qrId && (
-							<div className="mt-4 p-4 bg-green-50 dark:bg-green-900/30 rounded-lg w-full">
-								<p className="text-green-700 dark:text-green-400 text-sm font-medium mb-3 text-center flex items-center justify-center gap-1">
-									<IoCheckmarkCircle className="w-5 h-5" /> QR Code salvo com sucesso!
+							<div className="mt-3 sm:mt-4 p-3 sm:p-4 bg-green-50 dark:bg-green-900/30 rounded-lg w-full">
+								<p className="text-green-700 dark:text-green-400 text-xs sm:text-sm font-medium mb-2 sm:mb-3 text-center flex items-center justify-center gap-1">
+									<IoCheckmarkCircle className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />{" "}
+									<span>QR Code salvo com sucesso!</span>
 								</p>
-								<div className="flex gap-3 justify-center">
+								<div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
 									<button
 										onClick={handleDownload}
-										className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-1"
+										className="bg-green-600 hover:bg-green-700 text-white px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors text-xs sm:text-sm flex items-center justify-center gap-1"
 									>
 										<IoDownload className="w-4 h-4" /> Download
 									</button>
 									<button
 										onClick={() => router.push(`/dashboard/qr/${qrId}`)}
-										className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-1"
+										className="bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors text-xs sm:text-sm flex items-center justify-center gap-1"
 									>
 										Ver Detalhes <IoArrowForward className="w-4 h-4" />
 									</button>

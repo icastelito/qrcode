@@ -93,3 +93,87 @@ model QrAccessLog {
   @@index([utmCampaign])
   @@map("qr_access_log")
 }
+
+// ================================
+// Tabela de Links de Afiliados (Shopee)
+// ================================
+model AffiliateLink {
+  id           String   @id @default(cuid())
+  slug         String   @unique // URL amigável permanente: /a/slug
+  productName  String   @map("product_name")
+  productImage String?  @map("product_image") // URL da imagem do produto
+  affiliateUrl String   @map("affiliate_url") // Link de afiliado atual (expira)
+  createdBy    String   @map("created_by") // Nome/identificador do usuário
+  isActive     Boolean  @default(true) @map("is_active")
+  category     String?  // Categoria do produto (opcional)
+  notes        String?  // Notas/observações
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
+
+  // Relacionamento com logs de acesso
+  accessLogs AffiliateAccessLog[]
+
+  @@index([slug])
+  @@index([createdBy])
+  @@index([isActive])
+  @@index([category])
+  @@map("affiliate_link")
+}
+
+// ================================
+// Tabela de Logs de Acesso (Afiliados)
+// ================================
+model AffiliateAccessLog {
+  id        String   @id @default(cuid())
+  linkId    String   @map("link_id")
+  timestamp DateTime @default(now())
+  
+  // Identificação (LGPD/GDPR compliant)
+  ipHash    String   @map("ip_hash")
+  sessionId String?  @map("session_id")
+  isUniqueVisitor Boolean @default(false) @map("is_unique_visitor")
+  
+  // User Agent e Dispositivo
+  userAgent      String?  @map("user_agent")
+  device         String?
+  isMobile       Boolean  @default(false) @map("is_mobile")
+  browser        String?
+  browserVersion String?  @map("browser_version")
+  platform       String?
+  osVersion      String?  @map("os_version")
+  
+  // Geolocalização
+  country   String?
+  region    String?
+  city      String?
+  timezone  String?
+  latitude  Float?
+  longitude Float?
+  
+  // Origem e Campanha (UTM)
+  referer     String?
+  utmSource   String? @map("utm_source")
+  utmMedium   String? @map("utm_medium")
+  utmCampaign String? @map("utm_campaign")
+  utmTerm     String? @map("utm_term")
+  utmContent  String? @map("utm_content")
+  
+  // Rede Social de Origem (detectada)
+  socialNetwork String? @map("social_network") // instagram, facebook, tiktok, etc.
+  
+  // Contexto
+  language   String?
+  isBot      Boolean  @default(false) @map("is_bot")
+  responseTime Int?   @map("response_time")
+
+  // Relacionamento
+  affiliateLink AffiliateLink @relation(fields: [linkId], references: [id], onDelete: Cascade)
+
+  @@index([linkId])
+  @@index([timestamp])
+  @@index([linkId, timestamp])
+  @@index([ipHash])
+  @@index([country])
+  @@index([socialNetwork])
+  @@map("affiliate_access_log")
+}

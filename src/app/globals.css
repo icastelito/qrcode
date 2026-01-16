@@ -1,26 +1,75 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+	--background: #ffffff;
+	--foreground: #171717;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--font-sans: var(--font-geist-sans);
+	--font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+	:root {
+		--background: #0a0a0a;
+		--foreground: #ededed;
+	}
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+	background: var(--background);
+	color: var(--foreground);
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Responsividade para 4K e ultrawide */
+@media (min-width: 2560px) {
+	html {
+		font-size: 18px;
+	}
+}
+
+@media (min-width: 3840px) {
+	html {
+		font-size: 20px;
+	}
+}
+
+/* Tabelas responsivas */
+.table-responsive {
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
+/* Melhor scroll em mobile */
+@media (max-width: 768px) {
+	.table-responsive {
+		margin: 0 -1rem;
+		padding: 0 1rem;
+	}
+}
+
+/* Cards grid responsivo */
+.responsive-grid {
+	display: grid;
+	gap: 1rem;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+/* Scroll horizontal suave */
+.scroll-smooth {
+	scroll-behavior: smooth;
+}
+
+/* Esconder scrollbar mas manter funcionalidade */
+.scrollbar-hide {
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+	display: none;
 }
