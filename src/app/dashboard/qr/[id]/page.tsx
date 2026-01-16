@@ -187,7 +187,7 @@ export default async function QRCodeDetailPage({ params }: PageProps) {
 	const trackingUrl = `${baseUrl}/r/${qrCode.id}`;
 
 	// Cache buster baseado no updatedAt para forçar reload da imagem após edição
-	const cacheBuster = qrCode.updatedAt ? new Date(qrCode.updatedAt).getTime() : Date.now();
+	const cacheBuster = qrCode.updatedAt ? new Date(qrCode.updatedAt).getTime() : 0;
 
 	// Prepara dados do gráfico (últimos 14 dias) - usando timezone do Brasil
 	const chartData: { date: string; count: number }[] = [];

@@ -24,6 +24,63 @@ interface QRCodeTableProps {
 	qrCodes: QRCodeWithCount[];
 }
 
+interface SortableHeaderProps {
+	field: SortField;
+	children: React.ReactNode;
+	className?: string;
+	hideOnMobile?: boolean;
+	sortField: SortField;
+	sortDirection: SortDirection;
+	onSort: (field: SortField) => void;
+}
+
+function SortIcon({
+	field,
+	sortField,
+	sortDirection,
+}: {
+	field: SortField;
+	sortField: SortField;
+	sortDirection: SortDirection;
+}) {
+	if (sortField !== field) {
+		return (
+			<span className="ml-1 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
+				<IoChevronUp className="w-3 h-3" />
+			</span>
+		);
+	}
+	return sortDirection === "asc" ? (
+		<IoChevronUp className="w-4 h-4 ml-1 text-blue-600" />
+	) : (
+		<IoChevronDown className="w-4 h-4 ml-1 text-blue-600" />
+	);
+}
+
+function SortableHeader({
+	field,
+	children,
+	className = "",
+	hideOnMobile = false,
+	sortField,
+	sortDirection,
+	onSort,
+}: SortableHeaderProps) {
+	return (
+		<th
+			className={`px-3 sm:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors group select-none ${className} ${
+				hideOnMobile ? "hidden md:table-cell" : ""
+			}`}
+			onClick={() => onSort(field)}
+		>
+			<div className="flex items-center">
+				{children}
+				<SortIcon field={field} sortField={sortField} sortDirection={sortDirection} />
+			</div>
+		</th>
+	);
+}
+
 export default function QRCodeTable({ qrCodes }: QRCodeTableProps) {
 	const [sortField, setSortField] = useState<SortField>("createdAt");
 	const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
@@ -59,45 +116,6 @@ export default function QRCodeTable({ qrCodes }: QRCodeTableProps) {
 			setSortDirection(field === "name" ? "asc" : "desc");
 		}
 	};
-
-	const SortIcon = ({ field }: { field: SortField }) => {
-		if (sortField !== field) {
-			return (
-				<span className="ml-1 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
-					<IoChevronUp className="w-3 h-3" />
-				</span>
-			);
-		}
-		return sortDirection === "asc" ? (
-			<IoChevronUp className="w-4 h-4 ml-1 text-blue-600" />
-		) : (
-			<IoChevronDown className="w-4 h-4 ml-1 text-blue-600" />
-		);
-	};
-
-	const SortableHeader = ({
-		field,
-		children,
-		className = "",
-		hideOnMobile = false,
-	}: {
-		field: SortField;
-		children: React.ReactNode;
-		className?: string;
-		hideOnMobile?: boolean;
-	}) => (
-		<th
-			className={`px-3 sm:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors group select-none ${className} ${
-				hideOnMobile ? "hidden md:table-cell" : ""
-			}`}
-			onClick={() => handleSort(field)}
-		>
-			<div className="flex items-center">
-				{children}
-				<SortIcon field={field} />
-			</div>
-		</th>
-	);
 
 	if (qrCodes.length === 0) {
 		return (
@@ -155,14 +173,40 @@ export default function QRCodeTable({ qrCodes }: QRCodeTableProps) {
 				<table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
 					<thead className="bg-gray-50 dark:bg-gray-700">
 						<tr>
-							<SortableHeader field="name">Nome</SortableHeader>
-							<SortableHeader field="targetUrl" hideOnMobile>
+							<SortableHeader
+								field="name"
+								sortField={sortField}
+								sortDirection={sortDirection}
+								onSort={handleSort}
+							>
+								Nome
+							</SortableHeader>
+							<SortableHeader
+								field="targetUrl"
+								hideOnMobile
+								sortField={sortField}
+								sortDirection={sortDirection}
+								onSort={handleSort}
+							>
 								URL Destino
 							</SortableHeader>
-							<SortableHeader field="createdAt" hideOnMobile>
+							<SortableHeader
+								field="createdAt"
+								hideOnMobile
+								sortField={sortField}
+								sortDirection={sortDirection}
+								onSort={handleSort}
+							>
 								Criado em
 							</SortableHeader>
-							<SortableHeader field="accessLogs">Acessos</SortableHeader>
+							<SortableHeader
+								field="accessLogs"
+								sortField={sortField}
+								sortDirection={sortDirection}
+								onSort={handleSort}
+							>
+								Acessos
+							</SortableHeader>
 							<th className="px-3 sm:px-4 lg:px-6 py-2 sm:py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
 								Ações
 							</th>

@@ -203,7 +203,8 @@ export default function AffiliateDetailPage() {
 						href="/dashboard/affiliate"
 						className="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors text-sm sm:text-base"
 					>
-						<IoArrowBack className="w-4 h-4" /> <span className="hidden sm:inline">Voltar para lista</span><span className="sm:hidden">Voltar</span>
+						<IoArrowBack className="w-4 h-4" /> <span className="hidden sm:inline">Voltar para lista</span>
+						<span className="sm:hidden">Voltar</span>
 					</Link>
 				</div>
 
@@ -292,20 +293,25 @@ export default function AffiliateDetailPage() {
 										} ${renewing ? "opacity-50 cursor-not-allowed" : ""}`}
 									>
 										<IoSync className={`w-4 h-4 ${renewing ? "animate-spin" : ""}`} />
-										<span className="hidden sm:inline">{renewing ? "Renovando..." : renewSuccess ? "Renovado!" : "Renovar"}</span>
+										<span className="hidden sm:inline">
+											{renewing ? "Renovando..." : renewSuccess ? "Renovado!" : "Renovar"}
+										</span>
 									</button>
 									<Link
 										href={`/dashboard/affiliate/${link.id}/edit`}
 										className="px-3 sm:px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
 									>
-										<IoRefresh className="w-4 h-4" /> <span className="hidden sm:inline">Editar</span>
-								</Link>
+										<IoRefresh className="w-4 h-4" />{" "}
+										<span className="hidden sm:inline">Editar</span>
+									</Link>
+								</div>
 							</div>
 
 							{/* Erro de renovação */}
 							{renewError && (
 								<div className="mt-2 p-2 sm:p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg text-xs sm:text-sm flex items-center gap-2">
-									<IoCloseCircle className="w-4 h-4 flex-shrink-0" /> <span className="break-all">{renewError}</span>
+									<IoCloseCircle className="w-4 h-4 flex-shrink-0" />{" "}
+									<span className="break-all">{renewError}</span>
 								</div>
 							)}
 
@@ -313,8 +319,11 @@ export default function AffiliateDetailPage() {
 							{showProductUrlModal && (
 								<div className="mt-4 p-3 sm:p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
 									<p className="text-yellow-800 dark:text-yellow-200 text-xs sm:text-sm mb-3 flex items-start sm:items-center gap-2">
-										<IoWarning className="w-4 h-4 flex-shrink-0 mt-0.5 sm:mt-0" /> 
-										<span>Não foi possível detectar a URL do produto automaticamente. Cole a URL do produto da Shopee abaixo:</span>
+										<IoWarning className="w-4 h-4 flex-shrink-0 mt-0.5 sm:mt-0" />
+										<span>
+											Não foi possível detectar a URL do produto automaticamente. Cole a URL do
+											produto da Shopee abaixo:
+										</span>
 									</p>
 									<div className="flex flex-col sm:flex-row gap-2">
 										<input
@@ -349,7 +358,8 @@ export default function AffiliateDetailPage() {
 							{/* Notas */}
 							{link.notes && (
 								<div className="mt-4 p-2 sm:p-3 bg-gray-100 dark:bg-gray-700 rounded-lg text-xs sm:text-sm text-gray-600 dark:text-gray-300 flex items-start gap-2">
-									<IoDocumentText className="w-4 h-4 flex-shrink-0 mt-0.5" /> <span>{link.notes}</span>
+									<IoDocumentText className="w-4 h-4 flex-shrink-0 mt-0.5" />{" "}
+									<span>{link.notes}</span>
 								</div>
 							)}
 						</div>
@@ -420,7 +430,9 @@ export default function AffiliateDetailPage() {
 									))}
 							</div>
 						) : (
-							<p className="text-gray-400 dark:text-gray-500 text-center py-6 sm:py-8 text-sm">Sem dados ainda</p>
+							<p className="text-gray-400 dark:text-gray-500 text-center py-6 sm:py-8 text-sm">
+								Sem dados ainda
+							</p>
 						)}
 					</div>
 
@@ -458,7 +470,9 @@ export default function AffiliateDetailPage() {
 									))}
 							</div>
 						) : (
-							<p className="text-gray-400 dark:text-gray-500 text-center py-6 sm:py-8 text-sm">Sem dados ainda</p>
+							<p className="text-gray-400 dark:text-gray-500 text-center py-6 sm:py-8 text-sm">
+								Sem dados ainda
+							</p>
 						)}
 					</div>
 				</div>
@@ -475,9 +489,15 @@ export default function AffiliateDetailPage() {
 									<tr className="text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
 										<th className="text-left py-2 sm:py-3 px-2 font-medium">Data</th>
 										<th className="text-left py-2 sm:py-3 px-2 font-medium">Origem</th>
-										<th className="text-left py-2 sm:py-3 px-2 font-medium hidden sm:table-cell">Local</th>
-										<th className="text-left py-2 sm:py-3 px-2 font-medium hidden md:table-cell">Dispositivo</th>
-										<th className="text-left py-2 sm:py-3 px-2 font-medium hidden lg:table-cell">Navegador</th>
+										<th className="text-left py-2 sm:py-3 px-2 font-medium hidden sm:table-cell">
+											Local
+										</th>
+										<th className="text-left py-2 sm:py-3 px-2 font-medium hidden md:table-cell">
+											Dispositivo
+										</th>
+										<th className="text-left py-2 sm:py-3 px-2 font-medium hidden lg:table-cell">
+											Navegador
+										</th>
 										<th className="text-center py-2 sm:py-3 px-2 font-medium">Novo?</th>
 									</tr>
 								</thead>
