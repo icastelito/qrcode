@@ -15,6 +15,7 @@ import {
 	IoLocation,
 } from "react-icons/io5";
 import QRCodeActions from "@/components/QRCodeActions";
+import AccessLogsTable from "@/components/AccessLogsTable";
 
 // Desativa cache da página para sempre mostrar dados atualizados
 export const dynamic = "force-dynamic";
@@ -27,18 +28,6 @@ interface PageProps {
 interface StatItem {
 	name: string;
 	count: number;
-}
-
-interface AccessLog {
-	id: string;
-	timestamp: Date;
-	device: string | null;
-	browser: string | null;
-	platform: string | null;
-	country: string | null;
-	city: string | null;
-	isUniqueVisitor: boolean;
-	isMobile: boolean;
 }
 
 async function getQRCodeDetails(id: string) {
@@ -60,7 +49,6 @@ async function getAccessStats(qrId: string): Promise<{
 	countries: StatItem[];
 	browsers: StatItem[];
 	cities: StatItem[];
-	recentLogs: AccessLog[];
 	uniqueVisitors: number;
 	totalToday: number;
 	totalThisWeek: number;
@@ -127,24 +115,6 @@ async function getAccessStats(qrId: string): Promise<{
 		take: 10,
 	});
 
-	// Últimos acessos
-	const recentLogs = await prisma.qrAccessLog.findMany({
-		where: { qrId },
-		orderBy: { timestamp: "desc" },
-		take: 20,
-		select: {
-			id: true,
-			timestamp: true,
-			device: true,
-			browser: true,
-			platform: true,
-			country: true,
-			city: true,
-			isUniqueVisitor: true,
-			isMobile: true,
-		},
-	});
-
 	// Visitantes únicos
 	const uniqueVisitors = await prisma.qrAccessLog.count({
 		where: { qrId, isUniqueVisitor: true },
@@ -167,7 +137,6 @@ async function getAccessStats(qrId: string): Promise<{
 		countries: countries.map((c) => ({ name: c.country || "Desconhecido", count: c._count })),
 		browsers: browsers.map((b) => ({ name: b.browser || "Desconhecido", count: b._count })),
 		cities: cities.map((c) => ({ name: c.city || "Desconhecido", count: c._count })),
-		recentLogs,
 		uniqueVisitors,
 		totalToday,
 		totalThisWeek,
@@ -605,8 +574,8 @@ export default async function QRCodeDetailPage({ params }: PageProps) {
 										? Math.round(
 												((qrCode._count.accessLogs - stats.uniqueVisitors) /
 													qrCode._count.accessLogs) *
-													100
-										  )
+													100,
+											)
 										: 0}
 									%
 								</span>
@@ -625,87 +594,12 @@ export default async function QRCodeDetailPage({ params }: PageProps) {
 					</div>
 				</div>
 
-				{/* Últimos Acessos */}
-				<div className="bg-white dark:bg-gray-800 rounded-xl shadow overflow-hidden">
-					<div className="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
-						<div className="flex items-center gap-2">
-							<IoTime className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />
-							<h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
-								Últimos Acessos
-							</h3>
-						</div>
-					</div>
-					{stats.recentLogs.length === 0 ? (
-						<div className="p-4 sm:p-6 text-center text-gray-500 text-sm">Nenhum acesso registrado</div>
-					) : (
-						<div className="overflow-x-auto">
-							<table className="w-full min-w-[600px]">
-								<thead className="bg-gray-50 dark:bg-gray-700">
-									<tr>
-										<th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-											Data/Hora
-										</th>
-										<th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-											Dispositivo
-										</th>
-										<th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden sm:table-cell">
-											Navegador
-										</th>
-										<th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden md:table-cell">
-											Plataforma
-										</th>
-										<th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden lg:table-cell">
-											Localização
-										</th>
-										<th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-											Tipo
-										</th>
-									</tr>
-								</thead>
-								<tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-									{stats.recentLogs.map((log) => (
-										<tr
-											key={log.id}
-											className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-										>
-											<td className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900 dark:text-white">
-												{formatDateTimeBR(log.timestamp)}
-											</td>
-											<td className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-600 dark:text-gray-300">
-												<span className="flex items-center gap-1 sm:gap-2 capitalize">
-													{getDeviceIcon(log.device)}
-													<span className="hidden sm:inline">{log.device || "—"}</span>
-												</span>
-											</td>
-											<td className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-600 dark:text-gray-300 hidden sm:table-cell">
-												{log.browser || "—"}
-											</td>
-											<td className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-600 dark:text-gray-300 hidden md:table-cell">
-												{log.platform || "—"}
-											</td>
-											<td className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-600 dark:text-gray-300 hidden lg:table-cell">
-												{log.city && log.country
-													? `${log.city}, ${log.country}`
-													: log.country || "—"}
-											</td>
-											<td className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap">
-												{log.isUniqueVisitor ? (
-													<span className="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-														Novo
-													</span>
-												) : (
-													<span className="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-														Retorno
-													</span>
-												)}
-											</td>
-										</tr>
-									))}
-								</tbody>
-							</table>
-						</div>
-					)}
-				</div>
+				{/* Acessos com paginação e filtros */}
+				<AccessLogsTable
+					qrId={id}
+					availableDevices={stats.devices.filter((d) => d.name !== "Desconhecido").map((d) => d.name)}
+					availableCountries={stats.countries.filter((c) => c.name !== "Desconhecido").map((c) => c.name)}
+				/>
 			</div>
 		</div>
 	);
