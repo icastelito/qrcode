@@ -55,6 +55,7 @@ export default function EditAffiliateLinkPage() {
 
 	useEffect(() => {
 		fetchLink();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [id]);
 
 	const fetchLink = async () => {
@@ -205,8 +206,8 @@ export default function EditAffiliateLinkPage() {
 						status.status === "expired" || status.status === "danger"
 							? "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
 							: status.status === "warning"
-							? "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800"
-							: "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
+								? "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800"
+								: "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
 					}`}
 				>
 					<div className="flex items-center justify-between gap-3">
@@ -224,8 +225,8 @@ export default function EditAffiliateLinkPage() {
 									status.status === "expired" || status.status === "danger"
 										? "text-red-600 dark:text-red-400"
 										: status.status === "warning"
-										? "text-yellow-600 dark:text-yellow-400"
-										: "text-green-600 dark:text-green-400"
+											? "text-yellow-600 dark:text-yellow-400"
+											: "text-green-600 dark:text-green-400"
 								}`}
 							>
 								{daysRemaining}

@@ -18,7 +18,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 		if (!isShopeeConfigured()) {
 			return NextResponse.json(
 				{ error: "API da Shopee não configurada. Configure SHOPEE_APP_ID e SHOPEE_SECRET no .env" },
-				{ status: 503 }
+				{ status: 503 },
 			);
 		}
 
@@ -64,12 +64,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 					hint: "A URL deve ser do formato: https://shopee.com.br/Nome-do-Produto-i.LOJA_ID.PRODUCT_ID",
 					currentUrl: link.affiliateUrl,
 				},
-				{ status: 400 }
+				{ status: 400 },
 			);
 		}
 
 		// Gera novo link de afiliado usando a API da Shopee
-		const newAffiliateUrl = await renewAffiliateLink(productUrl, link.slug);
+		const newAffiliateUrl = await renewAffiliateLink(productUrl);
 
 		// Atualiza o link no banco de dados
 		const updatedLink = await prisma.affiliateLink.update({

@@ -12,11 +12,6 @@ interface ShopeeApiConfig {
 	secret: string;
 }
 
-interface GenerateShortLinkInput {
-	originUrl: string;
-	subIds?: string[];
-}
-
 interface ShopeeApiResponse<T> {
 	data?: T;
 	errors?: Array<{
@@ -65,7 +60,7 @@ function getShopeeConfig(): ShopeeApiConfig {
 async function shopeeGraphQL<T>(
 	query: string,
 	variables?: Record<string, unknown>,
-	operationName?: string
+	operationName?: string,
 ): Promise<T> {
 	const config = getShopeeConfig();
 
@@ -135,7 +130,7 @@ export async function generateAffiliateLink(originUrl: string, subIds?: string[]
  * @param linkSlug - Slug do link (não usado - subIds da Shopee têm restrições)
  * @returns Novo link de afiliado
  */
-export async function renewAffiliateLink(productUrl: string, _linkSlug?: string): Promise<string> {
+export async function renewAffiliateLink(productUrl: string): Promise<string> {
 	// Nota: subIds da Shopee têm restrições de formato, então não usamos o slug
 	return generateAffiliateLink(productUrl);
 }

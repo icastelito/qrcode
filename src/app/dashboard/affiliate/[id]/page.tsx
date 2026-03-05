@@ -99,6 +99,7 @@ export default function AffiliateDetailPage() {
 
 	useEffect(() => {
 		fetchLink();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [id]);
 
 	const fetchLink = async () => {
@@ -214,6 +215,7 @@ export default function AffiliateDetailPage() {
 						{/* Imagem */}
 						<div className="w-24 h-24 sm:w-32 sm:h-32 bg-gray-100 dark:bg-gray-700 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0 mx-auto lg:mx-0">
 							{link.productImage ? (
+								// eslint-disable-next-line @next/next/no-img-element
 								<img
 									src={link.productImage}
 									alt={link.productName}
@@ -249,8 +251,8 @@ export default function AffiliateDetailPage() {
 										status.status === "expired" || status.status === "danger"
 											? "bg-red-100 dark:bg-red-900/30"
 											: status.status === "warning"
-											? "bg-yellow-100 dark:bg-yellow-900/30"
-											: "bg-green-100 dark:bg-green-900/30"
+												? "bg-yellow-100 dark:bg-yellow-900/30"
+												: "bg-green-100 dark:bg-green-900/30"
 									}`}
 								>
 									<p
@@ -258,8 +260,8 @@ export default function AffiliateDetailPage() {
 											status.status === "expired" || status.status === "danger"
 												? "text-red-600 dark:text-red-400"
 												: status.status === "warning"
-												? "text-yellow-600 dark:text-yellow-400"
-												: "text-green-600 dark:text-green-400"
+													? "text-yellow-600 dark:text-yellow-400"
+													: "text-green-600 dark:text-green-400"
 										}`}
 									>
 										{daysRemaining}

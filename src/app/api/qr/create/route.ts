@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { generateQR, QRStyle, ModuleStyle } from "@/lib/qr-generator";
+import { generateQR, QRStyle } from "@/lib/qr-generator";
 import { Prisma } from "@prisma/client";
 
 interface CreateQRRequest {

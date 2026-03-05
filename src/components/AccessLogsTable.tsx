@@ -41,7 +41,7 @@ interface LogsResponse {
 interface AccessLogsTableProps {
 	qrId: string;
 	availableDevices: string[];
-	availableCountries: string[];
+	availableRegions: string[];
 }
 
 function formatDateTimeBR(dateStr: string): string {
@@ -69,7 +69,7 @@ function getDeviceIcon(device: string | null) {
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
 
-export default function AccessLogsTable({ qrId, availableDevices, availableCountries }: AccessLogsTableProps) {
+export default function AccessLogsTable({ qrId, availableDevices, availableRegions }: AccessLogsTableProps) {
 	const router = useRouter();
 	const [data, setData] = useState<LogsResponse | null>(null);
 	const [loading, setLoading] = useState(true);
@@ -78,10 +78,29 @@ export default function AccessLogsTable({ qrId, availableDevices, availableCount
 
 	// Filtros
 	const [filterDevice, setFilterDevice] = useState("");
-	const [filterCountry, setFilterCountry] = useState("");
+	const [filterRegion, setFilterRegion] = useState("");
+	const [filterCity, setFilterCity] = useState("");
 	const [filterDateFrom, setFilterDateFrom] = useState("");
 	const [filterDateTo, setFilterDateTo] = useState("");
 	const [showFilters, setShowFilters] = useState(false);
+
+	// Cidades disponíveis para o estado selecionado
+	const [availableCities, setAvailableCities] = useState<string[]>([]);
+	const [loadingCities, setLoadingCities] = useState(false);
+
+	// Quando o estado muda, busca cidades daquele estado e limpa a cidade selecionada
+	useEffect(() => {
+		setFilterCity("");
+		if (!filterRegion) {
+			setAvailableCities([]);
+			return;
+		}
+		setLoadingCities(true);
+		fetch(`/api/qr/${qrId}/logs/filters?region=${encodeURIComponent(filterRegion)}`)
+			.then((r) => r.json())
+			.then((json) => setAvailableCities(json.cities ?? []))
+			.finally(() => setLoadingCities(false));
+	}, [filterRegion, qrId]);
 
 	const fetchLogs = useCallback(async () => {
 		setLoading(true);
@@ -89,7 +108,8 @@ export default function AccessLogsTable({ qrId, availableDevices, availableCount
 		params.set("page", page.toString());
 		params.set("limit", limit.toString());
 		if (filterDevice) params.set("device", filterDevice);
-		if (filterCountry) params.set("country", filterCountry);
+		if (filterRegion) params.set("region", filterRegion);
+		if (filterCity) params.set("city", filterCity);
 		if (filterDateFrom) params.set("dateFrom", filterDateFrom);
 		if (filterDateTo) params.set("dateTo", filterDateTo);
 
@@ -102,7 +122,7 @@ export default function AccessLogsTable({ qrId, availableDevices, availableCount
 		} finally {
 			setLoading(false);
 		}
-	}, [qrId, page, limit, filterDevice, filterCountry, filterDateFrom, filterDateTo]);
+	}, [qrId, page, limit, filterDevice, filterRegion, filterCity, filterDateFrom, filterDateTo]);
 
 	useEffect(() => {
 		fetchLogs();
@@ -115,13 +135,14 @@ export default function AccessLogsTable({ qrId, availableDevices, availableCount
 
 	const clearFilters = () => {
 		setFilterDevice("");
-		setFilterCountry("");
+		setFilterRegion("");
+		setFilterCity("");
 		setFilterDateFrom("");
 		setFilterDateTo("");
 		setPage(1);
 	};
 
-	const hasActiveFilters = filterDevice || filterCountry || filterDateFrom || filterDateTo;
+	const hasActiveFilters = filterDevice || filterRegion || filterCity || filterDateFrom || filterDateTo;
 
 	return (
 		<div className="bg-white dark:bg-gray-800 rounded-xl shadow overflow-hidden">
@@ -168,7 +189,7 @@ export default function AccessLogsTable({ qrId, availableDevices, availableCount
 				{/* Painel de filtros */}
 				{showFilters && (
 					<div className="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
 							{/* Filtro dispositivo */}
 							<div>
 								<label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
@@ -188,18 +209,51 @@ export default function AccessLogsTable({ qrId, availableDevices, availableCount
 								</select>
 							</div>
 
-							{/* Filtro país */}
+							{/* Filtro estado */}
 							<div>
 								<label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
-									País
+									Estado
 								</label>
 								<select
-									value={filterCountry}
-									onChange={(e) => setFilterCountry(e.target.value)}
-									className="w-full text-sm border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+									value={filterRegion}
+									onChange={(e) => setFilterRegion(e.target.value)}
+									disabled={!!filterCity}
+									className="w-full text-sm border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-40 disabled:cursor-not-allowed"
 								>
-									<option value="">Todos os países</option>
-									{availableCountries.map((c) => (
+									<option value="">Todos os estados</option>
+									{availableRegions.map((r) => (
+										<option key={r} value={r}>
+											{r}
+										</option>
+									))}
+								</select>
+								{!!filterCity && (
+									<p className="text-[10px] text-gray-400 mt-0.5">
+										Limpe a cidade para filtrar por estado
+									</p>
+								)}
+							</div>
+
+							{/* Filtro cidade */}
+							<div>
+								<label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
+									Cidade
+									{loadingCities && <span className="ml-1 text-gray-400">(carregando...)</span>}
+								</label>
+								<select
+									value={filterCity}
+									onChange={(e) => setFilterCity(e.target.value)}
+									disabled={!filterRegion || loadingCities}
+									className="w-full text-sm border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-40 disabled:cursor-not-allowed"
+								>
+									<option value="">
+										{!filterRegion
+											? "Selecione um estado"
+											: availableCities.length === 0
+												? "Nenhuma cidade"
+												: "Todas as cidades"}
+									</option>
+									{availableCities.map((c) => (
 										<option key={c} value={c}>
 											{c}
 										</option>

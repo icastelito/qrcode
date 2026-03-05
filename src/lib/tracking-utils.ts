@@ -48,7 +48,7 @@ export function parseUserAgent(userAgent: string | null): UserAgentInfo {
 
 	// Detecta se é bot
 	const isBot = /bot|crawler|spider|crawling|facebookexternalhit|slurp|googlebot|bingbot|yandex|baidu|duckduck/i.test(
-		ua
+		ua,
 	);
 
 	// Detecta dispositivo
@@ -205,7 +205,7 @@ export function extractLanguage(headers: Headers): string | null {
 /**
  * Detecta método de scan baseado no referer e user-agent
  */
-export function detectScanMethod(headers: Headers, userAgent: string | null): string {
+export function detectScanMethod(headers: Headers): string {
 	const referer = headers.get("referer");
 
 	// Se não tem referer, provavelmente foi escaneado direto
@@ -315,7 +315,7 @@ export function collectTrackingData(request: Request): TrackingData {
 		utmTerm: utmParams.utmTerm,
 		utmContent: utmParams.utmContent,
 		language: extractLanguage(headers),
-		scanMethod: detectScanMethod(headers, userAgent),
+		scanMethod: detectScanMethod(headers),
 		isBot: uaInfo.isBot,
 	};
 }

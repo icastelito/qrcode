@@ -12,7 +12,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 	const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
 	const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "20")));
 	const device = searchParams.get("device") || undefined;
-	const country = searchParams.get("country") || undefined;
+	const region = searchParams.get("region") || undefined;
+	const city = searchParams.get("city") || undefined;
 	const dateFrom = searchParams.get("dateFrom") || undefined;
 	const dateTo = searchParams.get("dateTo") || undefined;
 
@@ -26,7 +27,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 	const where: any = { qrId };
 
 	if (device) where.device = device;
-	if (country) where.country = country;
+	if (region) where.region = region;
+	if (city) where.city = city;
 
 	if (dateFrom || dateTo) {
 		where.timestamp = {};

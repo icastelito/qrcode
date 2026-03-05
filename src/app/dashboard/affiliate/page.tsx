@@ -447,6 +447,7 @@ export default function AffiliateLinksPage() {
 														<div className="flex items-center gap-2 sm:gap-3">
 															<div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
 																{link.productImage ? (
+																	// eslint-disable-next-line @next/next/no-img-element
 																	<img
 																		src={link.productImage}
 																		alt={link.productName}
@@ -496,10 +497,10 @@ export default function AffiliateLinksPage() {
 																status.status === "expired"
 																	? "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400"
 																	: status.status === "danger"
-																	? "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400"
-																	: status.status === "warning"
-																	? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400"
-																	: "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400"
+																		? "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400"
+																		: status.status === "warning"
+																			? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400"
+																			: "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400"
 															}`}
 														>
 															{daysRemaining}

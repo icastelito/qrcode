@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { formatDateTimeBR, formatDateBR, toISODateBR, getDaysAgoBR, getTodayStartBR } from "@/lib/date-utils";
+import { formatDateTimeBR, toISODateBR, getDaysAgoBR, getTodayStartBR } from "@/lib/date-utils";
 import {
 	IoArrowBack,
 	IoDownload,
@@ -10,7 +10,6 @@ import {
 	IoPhonePortrait,
 	IoDesktop,
 	IoTabletPortrait,
-	IoTime,
 	IoPerson,
 	IoLocation,
 } from "react-icons/io5";
@@ -46,7 +45,7 @@ async function getAccessStats(qrId: string): Promise<{
 	dailyStats: Record<string, number>;
 	devices: StatItem[];
 	platforms: StatItem[];
-	countries: StatItem[];
+	regions: StatItem[];
 	browsers: StatItem[];
 	cities: StatItem[];
 	uniqueVisitors: number;
@@ -91,11 +90,11 @@ async function getAccessStats(qrId: string): Promise<{
 	});
 
 	// Países
-	const countries = await prisma.qrAccessLog.groupBy({
-		by: ["country"],
+	const regions = await prisma.qrAccessLog.groupBy({
+		by: ["region"],
 		where: { qrId },
 		_count: true,
-		orderBy: { _count: { country: "desc" } },
+		orderBy: { _count: { region: "desc" } },
 	});
 
 	// Browsers
@@ -134,7 +133,7 @@ async function getAccessStats(qrId: string): Promise<{
 		dailyStats,
 		devices: devices.map((d) => ({ name: d.device || "Desconhecido", count: d._count })),
 		platforms: platforms.map((p) => ({ name: p.platform || "Desconhecido", count: p._count })),
-		countries: countries.map((c) => ({ name: c.country || "Desconhecido", count: c._count })),
+		regions: regions.map((r) => ({ name: r.region || "Desconhecido", count: r._count })),
 		browsers: browsers.map((b) => ({ name: b.browser || "Desconhecido", count: b._count })),
 		cities: cities.map((c) => ({ name: c.city || "Desconhecido", count: c._count })),
 		uniqueVisitors,
@@ -492,24 +491,26 @@ export default async function QRCodeDetailPage({ params }: PageProps) {
 						)}
 					</div>
 
-					{/* Países */}
+					{/* Estados */}
 					<div className="bg-white dark:bg-gray-800 rounded-xl shadow p-4 sm:p-6">
 						<div className="flex items-center gap-2 mb-3 sm:mb-4">
 							<IoGlobe className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500" />
-							<h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Países</h3>
+							<h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
+								Estados
+							</h3>
 						</div>
-						{stats.countries.length === 0 ? (
+						{stats.regions.length === 0 ? (
 							<p className="text-gray-500 text-sm">Nenhum dado</p>
 						) : (
 							<div className="space-y-2 sm:space-y-3">
-								{stats.countries.slice(0, 5).map((country) => {
-									const percent = Math.round((country.count / qrCode._count.accessLogs) * 100);
+								{stats.regions.slice(0, 5).map((region) => {
+									const percent = Math.round((region.count / qrCode._count.accessLogs) * 100);
 									return (
-										<div key={country.name}>
+										<div key={region.name}>
 											<div className="flex justify-between items-center mb-1 text-sm">
-												<span className="text-gray-600 dark:text-gray-300">{country.name}</span>
+												<span className="text-gray-600 dark:text-gray-300">{region.name}</span>
 												<span className="font-medium text-gray-900 dark:text-white">
-													{country.count} ({percent}%)
+													{region.count} ({percent}%)
 												</span>
 											</div>
 											<div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
@@ -598,7 +599,7 @@ export default async function QRCodeDetailPage({ params }: PageProps) {
 				<AccessLogsTable
 					qrId={id}
 					availableDevices={stats.devices.filter((d) => d.name !== "Desconhecido").map((d) => d.name)}
-					availableCountries={stats.countries.filter((c) => c.name !== "Desconhecido").map((c) => c.name)}
+					availableRegions={stats.regions.filter((r) => r.name !== "Desconhecido").map((r) => r.name)}
 				/>
 			</div>
 		</div>

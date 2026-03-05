@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
 		if (!isShopeeConfigured()) {
 			return NextResponse.json(
 				{ error: "API da Shopee não configurada. Configure SHOPEE_APP_ID e SHOPEE_SECRET no .env" },
-				{ status: 503 }
+				{ status: 503 },
 			);
 		}
 
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
 				}
 
 				// Renova o link
-				const newUrl = await renewAffiliateLink(urlToUse, link.slug);
+				const newUrl = await renewAffiliateLink(urlToUse);
 
 				// Atualiza no banco
 				await prisma.affiliateLink.update({

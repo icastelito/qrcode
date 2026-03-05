@@ -92,6 +92,7 @@ export default function NewQRCodePage() {
 				clearTimeout(previewTimeoutRef.current);
 			}
 		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [
 		formData.size,
 		formData.darkColor,

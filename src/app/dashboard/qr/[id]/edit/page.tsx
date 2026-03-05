@@ -144,6 +144,7 @@ export default function EditQRCodePage() {
 				clearTimeout(previewTimeoutRef.current);
 			}
 		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [formData, qrData]);
 
 	// Gera preview inicial após carregar dados
@@ -151,6 +152,7 @@ export default function EditQRCodePage() {
 		if (qrData && !previewUrl) {
 			generatePreview();
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [qrData]);
 
 	const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {

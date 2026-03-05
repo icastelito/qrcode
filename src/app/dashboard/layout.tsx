@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { IoQrCode, IoStorefront, IoAddCircle, IoList, IoMenu } from "react-icons/io5";
+import { IoQrCode, IoStorefront, IoAddCircle, IoList } from "react-icons/io5";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
 	return (
