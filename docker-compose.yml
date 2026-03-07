@@ -15,8 +15,8 @@ services:
         environment:
             - NODE_ENV=production
             # Conecta ao container PostgreSQL existente 'contador-visitas-db'
-            # Formato: postgresql://usuario:senha@container_name:5432/nome_do_banco
-            - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@contador-visitas-db:5432/${POSTGRES_DB:-qrcode_tracker}?schema=public
+            # Formato: pega o database URL do .env
+            - DATABASE_URL=${DATABASE_URL}
             - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-sua-chave-secreta-aqui}
             - IP_HASH_SALT=${IP_HASH_SALT:-salt-secreto-para-hash}
             - NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL:-http://localhost:3007}
@@ -27,12 +27,11 @@ services:
             retries: 3
             start_period: 40s
         networks:
-            - contador-network
+            - qrcode-network
 
 # ================================
-# Rede externa - usa a mesma rede do container contador-visitas-db
+# Rede interna do projeto
 # ================================
 networks:
-    contador-network:
-        external: true
-        name: contador-de-visitas_contador-network
+    qrcode-network:
+        driver: bridge
