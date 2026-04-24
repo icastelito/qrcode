@@ -18,7 +18,7 @@ import {
 	IoPhonePortrait,
 } from "react-icons/io5";
 
-export default function NewQRCodePage() {
+function NewQRCodePageInner() {
 	const router = useRouter();
 	const [isLoading, setIsLoading] = useState(false);
 	const [isLoadingPreview, setIsLoadingPreview] = useState(false);
@@ -521,4 +521,8 @@ export default function NewQRCodePage() {
 			</div>
 		</div>
 	);
+}
+
+export default function NewQRCodePage() {
+	return <NewQRCodePageInner />;
 }

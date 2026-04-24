@@ -22,7 +22,7 @@ model QrCode {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
-  // Relacionamento com logs de acesso
+  // Relacionamentos
   accessLogs QrAccessLog[]
 
   @@map("qr_code")

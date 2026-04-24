@@ -18,7 +18,7 @@ type QRCodeWithCount = {
 };
 
 async function getQRCodes(): Promise<QRCodeWithCount[]> {
-	const qrCodes = await prisma.qrCode.findMany({
+	return prisma.qrCode.findMany({
 		orderBy: { createdAt: "desc" },
 		include: {
 			_count: {
@@ -26,7 +26,6 @@ async function getQRCodes(): Promise<QRCodeWithCount[]> {
 			},
 		},
 	});
-	return qrCodes;
 }
 
 export default async function DashboardQRPage() {
@@ -70,8 +69,8 @@ export default async function DashboardQRPage() {
 						<p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mt-1">
 							{qrCodes.length > 0
 								? Math.round(
-										qrCodes.reduce((acc, qr) => acc + qr._count.accessLogs, 0) / qrCodes.length
-								  )
+										qrCodes.reduce((acc, qr) => acc + qr._count.accessLogs, 0) / qrCodes.length,
+									)
 								: 0}
 						</p>
 					</div>

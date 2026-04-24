@@ -15,6 +15,9 @@ import {
 } from "react-icons/io5";
 import QRCodeActions from "@/components/QRCodeActions";
 import AccessLogsTable from "@/components/AccessLogsTable";
+import DailyAccessChart from "@/components/DailyAccessChart";
+import BrazilHeatmapWrapper from "@/components/BrazilHeatmapWrapper";
+import type { HeatPoint } from "@/components/BrazilHeatmap";
 
 // Desativa cache da página para sempre mostrar dados atualizados
 export const dynamic = "force-dynamic";
@@ -51,6 +54,7 @@ async function getAccessStats(qrId: string): Promise<{
 	uniqueVisitors: number;
 	totalToday: number;
 	totalThisWeek: number;
+	heatPoints: HeatPoint[];
 }> {
 	// Acessos por dia (últimos 30 dias) - usando timezone do Brasil
 	const thirtyDaysAgo = getDaysAgoBR(30);
@@ -129,6 +133,23 @@ async function getAccessStats(qrId: string): Promise<{
 		where: { qrId, timestamp: { gte: weekAgo } },
 	});
 
+	// Pontos de calor (agrupados por lat/lng)
+	const rawHeatPoints = await prisma.qrAccessLog.groupBy({
+		by: ["latitude", "longitude"],
+		where: {
+			qrId,
+			latitude: { not: null },
+			longitude: { not: null },
+		},
+		_count: { id: true },
+		orderBy: { _count: { id: "desc" } },
+		take: 500,
+	});
+
+	const heatPoints: HeatPoint[] = rawHeatPoints
+		.filter((p) => p.latitude !== null && p.longitude !== null)
+		.map((p) => ({ lat: p.latitude!, lng: p.longitude!, count: p._count.id }));
+
 	return {
 		dailyStats,
 		devices: devices.map((d) => ({ name: d.device || "Desconhecido", count: d._count })),
@@ -139,6 +160,7 @@ async function getAccessStats(qrId: string): Promise<{
 		uniqueVisitors,
 		totalToday,
 		totalThisWeek,
+		heatPoints,
 	};
 }
 
@@ -157,9 +179,9 @@ export default async function QRCodeDetailPage({ params }: PageProps) {
 	// Cache buster baseado no updatedAt para forçar reload da imagem após edição
 	const cacheBuster = qrCode.updatedAt ? new Date(qrCode.updatedAt).getTime() : 0;
 
-	// Prepara dados do gráfico (últimos 14 dias) - usando timezone do Brasil
+	// Prepara dados do gráfico (últimos 30 dias) - usando timezone do Brasil
 	const chartData: { date: string; count: number }[] = [];
-	for (let i = 13; i >= 0; i--) {
+	for (let i = 29; i >= 0; i--) {
 		const date = new Date();
 		date.setDate(date.getDate() - i);
 		const dateStr = toISODateBR(date);
@@ -168,8 +190,6 @@ export default async function QRCodeDetailPage({ params }: PageProps) {
 			count: stats.dailyStats[dateStr] || 0,
 		});
 	}
-
-	const maxCount = Math.max(...chartData.map((d) => d.count), 1);
 
 	// Calcula total de acessos do período do gráfico
 	const totalChartPeriod = chartData.reduce((sum, d) => sum + d.count, 0);
@@ -291,92 +311,11 @@ export default async function QRCodeDetailPage({ params }: PageProps) {
 							Acessos por Dia
 						</h2>
 						<span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-							Últimos 14 dias • {totalChartPeriod} acessos
+							Últimos 30 dias • {totalChartPeriod} acessos
 						</span>
 					</div>
 
-					{/* Gráfico de barras melhorado */}
-					<div className="relative h-48 sm:h-64 overflow-x-auto">
-						{/* Linhas de grade horizontais */}
-						<div className="absolute inset-0 flex flex-col justify-between min-w-[400px] sm:min-w-0">
-							{[0, 1, 2, 3, 4].map((i) => (
-								<div key={i} className="flex items-center">
-									<span className="text-xs text-gray-400 w-6 sm:w-8 text-right mr-2 sm:mr-3">
-										{Math.round(maxCount - (maxCount / 4) * i)}
-									</span>
-									<div className="flex-1 border-t border-gray-100 dark:border-gray-700" />
-								</div>
-							))}
-						</div>
-
-						{/* Área do gráfico */}
-						<div className="absolute inset-0 pl-8 sm:pl-11 pt-2 pb-6 sm:pb-8 flex items-end gap-0.5 sm:gap-1 min-w-[400px] sm:min-w-0">
-							{chartData.map((day, index) => {
-								const heightPercent = maxCount > 0 ? (day.count / maxCount) * 100 : 0;
-								const isToday = index === chartData.length - 1;
-								return (
-									<div
-										key={day.date}
-										className="flex-1 flex flex-col items-center group relative h-full justify-end"
-									>
-										{/* Barra */}
-										<div
-											className={`w-full rounded-t-md transition-all duration-200 ${
-												isToday
-													? "bg-gradient-to-t from-green-500 to-green-400 hover:from-green-600 hover:to-green-500"
-													: "bg-gradient-to-t from-blue-500 to-blue-400 hover:from-blue-600 hover:to-blue-500"
-											}`}
-											style={{
-												height: `${Math.max(heightPercent, day.count > 0 ? 3 : 0)}%`,
-												minHeight: day.count > 0 ? "8px" : "0",
-											}}
-										>
-											{/* Tooltip */}
-											<div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20 shadow-lg">
-												<div className="font-medium">{day.count} acessos</div>
-												<div className="text-xs text-gray-300">
-													{new Date(day.date + "T12:00:00").toLocaleDateString("pt-BR", {
-														timeZone: "America/Sao_Paulo",
-														weekday: "short",
-														day: "2-digit",
-														month: "short",
-													})}
-												</div>
-												<div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900 dark:border-t-gray-700" />
-											</div>
-										</div>
-
-										{/* Valor acima da barra */}
-										{day.count > 0 && (
-											<span className="absolute bottom-full mb-1 text-xs font-semibold text-gray-700 dark:text-gray-300">
-												{day.count}
-											</span>
-										)}
-									</div>
-								);
-							})}
-						</div>
-
-						{/* Labels do eixo X */}
-						<div className="absolute bottom-0 left-8 sm:left-11 right-0 flex gap-0.5 sm:gap-1 min-w-[400px] sm:min-w-0">
-							{chartData.map((day, index) => {
-								const isToday = index === chartData.length - 1;
-								return (
-									<div key={day.date} className="flex-1 text-center">
-										<span
-											className={`text-[10px] sm:text-xs ${
-												isToday
-													? "font-semibold text-green-600 dark:text-green-400"
-													: "text-gray-500 dark:text-gray-400"
-											}`}
-										>
-											{day.date.slice(8)}/{day.date.slice(5, 7)}
-										</span>
-									</div>
-								);
-							})}
-						</div>
-					</div>
+					<DailyAccessChart chartData={chartData} />
 				</div>
 
 				{/* Stats Grid - 2x3 */}
@@ -582,14 +521,16 @@ export default async function QRCodeDetailPage({ params }: PageProps) {
 								</span>
 							</div>
 							<div className="flex justify-between items-center p-2 sm:p-3 bg-gray-50 dark:bg-gray-700 rounded-lg text-sm">
-								<span className="text-gray-600 dark:text-gray-300">Média Diária (14d)</span>
+								<span className="text-gray-600 dark:text-gray-300">Média Diária (30d)</span>
 								<span className="font-bold text-indigo-600 dark:text-indigo-400">
-									{(totalChartPeriod / 14).toFixed(1)}
+									{(totalChartPeriod / 30).toFixed(1)}
 								</span>
 							</div>
 							<div className="flex justify-between items-center p-2 sm:p-3 bg-gray-50 dark:bg-gray-700 rounded-lg text-sm">
 								<span className="text-gray-600 dark:text-gray-300">Pico do Período</span>
-								<span className="font-bold text-indigo-600 dark:text-indigo-400">{maxCount}</span>
+								<span className="font-bold text-indigo-600 dark:text-indigo-400">
+									{Math.max(...chartData.map((d) => d.count), 0)}
+								</span>
 							</div>
 						</div>
 					</div>
@@ -601,6 +542,20 @@ export default async function QRCodeDetailPage({ params }: PageProps) {
 					availableDevices={stats.devices.filter((d) => d.name !== "Desconhecido").map((d) => d.name)}
 					availableRegions={stats.regions.filter((r) => r.name !== "Desconhecido").map((r) => r.name)}
 				/>
+
+				{/* Mapa de Distribuição Geográfica */}
+				<div className="bg-white dark:bg-gray-800 rounded-xl shadow p-4 sm:p-6 mt-6 sm:mt-8 mb-6 sm:mb-8">
+					<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 gap-2">
+						<h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
+							Distribuição Geográfica
+						</h2>
+						<span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+							{stats.heatPoints.length} localização{stats.heatPoints.length !== 1 ? "ões" : ""} registrada
+							{stats.heatPoints.length !== 1 ? "s" : ""}
+						</span>
+					</div>
+					<BrazilHeatmapWrapper points={stats.heatPoints} />
+				</div>
 			</div>
 		</div>
 	);

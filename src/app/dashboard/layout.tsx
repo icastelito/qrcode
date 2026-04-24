@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { IoQrCode, IoStorefront, IoAddCircle, IoList } from "react-icons/io5";
+import { IoQrCode, IoAddCircle, IoList } from "react-icons/io5";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
 	return (
@@ -8,7 +8,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 			<nav className="bg-white dark:bg-gray-800 shadow-md border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
 				<div className="max-w-[1920px] 2xl:max-w-[2560px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
 					<div className="flex justify-between h-14 sm:h-16">
-						<div className="flex items-center w-full">
+						<div className="flex items-center">
 							{/* Logo */}
 							<Link
 								href="/dashboard/qr"
@@ -36,39 +36,25 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 									<span className="hidden lg:inline">Novo QR</span>
 									<span className="lg:hidden">+</span>
 								</Link>
-								<Link
-									href="/dashboard/affiliate"
-									className="text-gray-700 dark:text-gray-200 hover:bg-white dark:hover:bg-gray-600 px-2 md:px-3 py-1.5 md:py-2 rounded-md text-xs md:text-sm font-medium flex items-center gap-1 md:gap-1.5 transition-colors"
-								>
-									<IoStorefront className="w-4 h-4" />
-									<span className="hidden md:inline">Afiliados</span>
-								</Link>
 							</div>
+						</div>
 
-							{/* Menu Principal - Mobile */}
-							<div className="flex sm:hidden ml-auto items-center gap-1">
-								<Link
-									href="/dashboard/qr"
-									className="text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 p-2 rounded-lg transition-colors"
-									title="QR Codes"
-								>
-									<IoList className="w-5 h-5" />
-								</Link>
-								<Link
-									href="/dashboard/qr/new"
-									className="text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 p-2 rounded-lg transition-colors"
-									title="Novo QR"
-								>
-									<IoAddCircle className="w-5 h-5" />
-								</Link>
-								<Link
-									href="/dashboard/affiliate"
-									className="text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 p-2 rounded-lg transition-colors"
-									title="Afiliados"
-								>
-									<IoStorefront className="w-5 h-5" />
-								</Link>
-							</div>
+						{/* Menu Principal - Mobile */}
+						<div className="flex sm:hidden ml-auto items-center gap-1">
+							<Link
+								href="/dashboard/qr"
+								className="text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 p-2 rounded-lg transition-colors"
+								title="QR Codes"
+							>
+								<IoList className="w-5 h-5" />
+							</Link>
+							<Link
+								href="/dashboard/qr/new"
+								className="text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 p-2 rounded-lg transition-colors"
+								title="Novo QR"
+							>
+								<IoAddCircle className="w-5 h-5" />
+							</Link>
 						</div>
 					</div>
 				</div>
