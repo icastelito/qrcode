@@ -8,11 +8,11 @@ RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
 # Copia arquivos de dependências
-COPY package.json ./
+COPY package.json package-lock.json ./
 COPY prisma ./prisma/
 
-# Instala dependências (usa npm install para gerar dependências corretas para Linux)
-RUN npm install --legacy-peer-deps
+# Instala dependências (usa versões exatas do lock file)
+RUN npm ci --legacy-peer-deps
 
 # ================================
 # Estágio 2: Build
